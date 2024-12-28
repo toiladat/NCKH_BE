@@ -1,8 +1,11 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
+import mongoose from 'mongoose'
 
 import roomRoute from './routes/room.route'
+import { connect } from './config/mongodb'
+import userRoute from './routes/user.route'
 
 dotenv.config()
 
@@ -21,8 +24,10 @@ app.use(express.json({
   limit:'10mb'
 }))
 
-
+//Route
 app.use('/room', roomRoute)
+
+app.use('/user', userRoute)
 
 app.use('/', (req, res) => res.json({
   message:'Welcome to our API'
@@ -33,9 +38,13 @@ app.use((req, res) => res.status(404).json({
   message:'Not Found'
 }))
 
+//End Route
+
+
 const startServer = async () => {
   try {
     // connect to MongoDB
+    await connect()
     app.listen(port, () => console.log(`Server is listening on port ${port}`))
   } catch (error) {
     console.log(error)
