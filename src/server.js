@@ -1,32 +1,44 @@
-/**
- * Updated by trungquandev.com's author on August 17 2023
- * YouTube: https://youtube.com/@trungquandev
- * "A bit of fragrance clings to the hand that gives flowers!"
- */
-
 import express from 'express'
-import { mapOrder } from '~/utils/sorts.js'
+import dotenv from 'dotenv'
+import cors from 'cors'
 
+import roomRoute from './routes/room.route'
+
+dotenv.config()
+
+const port = process.env.PORT || 5000
 const app = express()
 
-const hostname = 'localhost'
-const port = 8017
+const corsOptions = {
+  origin: process.env.CLIENT_URL, // Chỉ định client có thể truy cập
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Các phương thức được phép
+  allowedHeaders: ['Content-Type', 'Authorization'] // Các headers được phép
+}
+app.use(cors(corsOptions))
 
-app.get('/', (req, res) => {
-  // Test Absolute import mapOrder
-  console.log(mapOrder(
-    [ { id: 'id-1', name: 'One' },
-      { id: 'id-2', name: 'Two' },
-      { id: 'id-3', name: 'Three' },
-      { id: 'id-4', name: 'Four' },
-      { id: 'id-5', name: 'Five' } ],
-    ['id-5', 'id-4', 'id-2', 'id-3', 'id-1'],
-    'id'
-  ))
-  res.end('<h1>Hello World!</h1><hr>')
-})
 
-app.listen(port, hostname, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Hello Trung Quan Dev, I am running at ${ hostname }:${ port }/`)
-})
+app.use(express.json({
+  limit:'10mb'
+}))
+
+
+app.use('/room', roomRoute)
+
+app.use('/', (req, res) => res.json({
+  message:'Welcome to our API'
+}))
+
+app.use((req, res) => res.status(404).json({
+  success:false,
+  message:'Not Found'
+}))
+
+const startServer = async () => {
+  try {
+    // connect to MongoDB
+    app.listen(port, () => console.log(`Server is listening on port ${port}`))
+  } catch (error) {
+    console.log(error)
+  }
+}
+startServer()
