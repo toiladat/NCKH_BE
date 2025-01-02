@@ -1,5 +1,5 @@
 import { OAuth2Client } from 'google-auth-library'
-
+import jwt from 'jsonwebtoken'
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 const authUser = async (req, res, next ) => {
@@ -12,6 +12,8 @@ const authUser = async (req, res, next ) => {
         audience:process.env.GOOGLE_CLIENT_ID
       })
       const payload = tiket.getPayload()
+
+      // Gán user data xuống controller
       req.user={
         id:payload.sub,
         name:payload.name,
@@ -20,6 +22,9 @@ const authUser = async (req, res, next ) => {
     }
     else {
       // to do verify our custom jwt token
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET) // Xác minh token
+      const { id, name, photoURL } = decodedToken
+      req.user = { id, name, photoURL }
     }
     next()
 

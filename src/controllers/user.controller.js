@@ -25,7 +25,6 @@ export const register = tryCatch( async ( req, res ) => {
     password: hashedPassword,
     token
   })
-
   const { _id: id, photoURL } = user
   const token = jwt.sign(
     { id, name, photoURL }, // thông tin để mã hóa
@@ -45,7 +44,6 @@ export const register = tryCatch( async ( req, res ) => {
 //[POST] user/login
 export const login = tryCatch( async( req, res ) => {
   const { email, password } = req.body
-  console.log(req.body);
   const emailLowerCase= email.toLowerCase()
   const existUser =await User.findOne({ email:emailLowerCase })
   if (!existUser) {
@@ -65,13 +63,38 @@ export const login = tryCatch( async( req, res ) => {
 
   const token = jwt.sign( // Không lưu token mà dùng giá trị hash ra để compare
     { id, name, photoURL },
-    process.env.JWT_SCRETE,
+    process.env.JWT_SECRET,
     { expiresIn: '1h' }
   )
   res.status(200).json({
     success:true,
     result:{
       id, name, email: emailLowerCase, photoURL, token
+    }
+  })
+})
+
+//[PATCH] user/updateProfile
+export const updateProfile = tryCatch(async (req, res ) => {
+  const updateUser = await User.findByIdAndUpdate(
+    req.user.id, //find by id
+    req.body, // update
+    {
+      new: true //return newest record
+    }
+  )
+  const { _id: id, name, photoURL }= updateUser
+
+  const token = jwt.sign(
+    { id, name, photoURL },
+    process.env.JWT_SECRET,
+    { expiresIn:'1h' }
+  )
+
+  res.status(200).json({
+    success:true,
+    result:{
+      name, photoURL, token
     }
   })
 })
