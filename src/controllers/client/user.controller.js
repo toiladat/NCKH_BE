@@ -1,7 +1,7 @@
 import User from '~/models/user.model'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import tryCatch from './utils/tryCatch'
+import tryCatch from '~/utils/tryCatch'
 //[POST] user/register
 export const register = tryCatch( async ( req, res ) => {
   const { name, email, password } = req.body

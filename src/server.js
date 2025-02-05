@@ -1,12 +1,13 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
-import mongoose from 'mongoose'
 import bodyParser from 'body-parser'
 
-import roomRoute from './routes/room.route'
+import needHelp from './routes/client/need-help.route'
 import { connect } from './config/mongodb'
-import userRoute from './routes/user.route'
+import userRoute from './routes/client/user.route'
+import clientRoute from './routes/client/index.route'
+import adminRoute from './routes/admin/index.route'
 
 dotenv.config()
 
@@ -33,13 +34,8 @@ app.use(express.json({
 }))
 
 //Route
-app.use('/room', roomRoute)
-
-app.use('/user', userRoute)
-
-app.get('/', (req, res) => res.json({
-  message:'Welcome to our API'
-}))
+app.use('/', clientRoute)
+app.use('/admin', adminRoute)
 
 app.use((req, res) => res.status(404).json({
   success:false,

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const roomSchema= mongoose.Schema({
+const needHelpSchema= mongoose.Schema({
   lng:{ type:Number, require:true },
   lat:{ type:Number, require:true },
   price:{ type:Number, min:0, max:50, default:0 },
@@ -15,5 +15,5 @@ const roomSchema= mongoose.Schema({
 }
 )
 
-const Room = mongoose.model('rooms', roomSchema)
-export default Room
+const needHelp = mongoose.model('needHelp', needHelpSchema, 'need-help')
+export default needHelp
