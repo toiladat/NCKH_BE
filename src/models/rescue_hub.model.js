@@ -11,11 +11,15 @@ const rescueHubSchema = new mongoose.Schema({
   },
   status: {
     type: Boolean,
-    default: false
+    default: true
   },
   supplies: {
     type: [String],
     default: []
+  },
+  description:{
+    type:String,
+    default:''
   },
   start_time: {
     type: Date,
@@ -25,13 +29,17 @@ const rescueHubSchema = new mongoose.Schema({
     type: Date,
     default: () => Date.now() + 3 * 24 * 60 * 60 * 1000
   },
-  target_address: {
+  location_start: {
     lng: { type: Number, default: null },
     lat: { type: Number, default: null }
   },
-  storage_address: {
+  location_end: {
     lng: { type: Number, default: null },
     lat: { type: Number, default: null }
+  },
+  images: {
+    type:[String],
+    default:[]
   },
   contact_info: {
     type: String,

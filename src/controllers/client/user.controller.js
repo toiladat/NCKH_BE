@@ -28,7 +28,7 @@ export const register = tryCatch( async ( req, res ) => {
   const { _id: id, photoURL } = user
   const token = jwt.sign(
     { id, name, photoURL }, // thông tin để mã hóa
-    process.env.JWT_SCRETE,
+    process.env.JWT_SECRET,
     { expiresIn: '1h' }
   )
 
