@@ -3,9 +3,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 
-import needHelp from './routes/client/need-help.route'
 import { connect } from './config/mongodb'
-import userRoute from './routes/client/user.route'
 import clientRoute from './routes/client/index.route'
 import adminRoute from './routes/admin/index.route'
 

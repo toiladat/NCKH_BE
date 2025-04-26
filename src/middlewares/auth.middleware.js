@@ -4,6 +4,13 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 const authUser = async (req, res, next ) => {
   try {
+    if (! req.headers.authorization) {
+      res.status(404).json({
+        success:false,
+        message:'Please provide the token'
+      })
+      return
+    }
     const token =req.headers.authorization.split(' ')[1]
     const googleToken = token.length > 1000
     if (googleToken) {

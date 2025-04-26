@@ -22,8 +22,20 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  rating: { type: Number, default: 5 }
+  status: {
+    type: String,
+    enum: ['active', 'inactive', 'banned'],
+    default: 'active'
+  },
+  roleId:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Role',
+    required: true,
+    default:''
+  }
 
+}, {
+  timestamps:true
 })
 
 const User = mongoose.model('user', userSchema, 'users')

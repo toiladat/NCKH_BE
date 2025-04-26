@@ -6,7 +6,7 @@ export const createNeedHelp = tryCatch( async (req, res) => {
   const { id: userId }= req.user
   const newNeedHelp = new needHelp({
     ...req.body,
-    userId:userId
+    createdBy:userId
   })
   await newNeedHelp.save()
   res.status(201).json({
@@ -20,10 +20,33 @@ export const getNeedHelps = tryCatch( async ( req, res) => {
   const needHelps = await needHelp.find()
   const result = await Promise.all(
     needHelps.map(async (needHelp) => {
-      const userInfor = await User.findOne({ _id: needHelp.userId }).select('name photoURL')
+
+      // lấy ra thông tin người up
+      const userInfor = await User.findOne({ _id: needHelp.createdBy }).select('name photoURL')
+      // lấy ra ids người đánh giá nâng cao
+      const validByIds = needHelp?.ratingCount.filter(item => item.userType ==='Cơ quan chức năng' || item.userType ==='Tình nguyện viên')
+      // lấy ra tên người đánh giá nâng cao
+      const validByNames = await User.find({
+        '_id': {
+          $in: validByIds.map(item => item.ratedById)
+        }
+      }).select('name')
+
+      //kết hợp tên và kiểu người đánh giá
+      const validByUsers = validByIds.map( item => {
+        const user = validByNames.find( user => user._id.toString() === item.ratedById.toString())
+        return {
+          ratedById: item.ratedById,
+          userType: item.userType,
+          name: user ? user.name : 'Người dùng chưa xác định'
+        }
+      })
+
+
       return {
         ...needHelp._doc,
-        userInfor
+        userInfor,
+        validByUsers: validByUsers
       }
     })
   )

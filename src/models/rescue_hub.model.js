@@ -1,17 +1,9 @@
 import mongoose from 'mongoose'
 
 const rescueHubSchema = new mongoose.Schema({
-  createdBy: {
-    type: String,
-    required: true
-  },
   contributters: {
     type: [String],
     default: []
-  },
-  status: {
-    type: Boolean,
-    default: true
   },
   supplies: {
     type: [String],
@@ -41,9 +33,30 @@ const rescueHubSchema = new mongoose.Schema({
     type:[String],
     default:[]
   },
-  contact_info: {
-    type: String,
-    default: '' // Ví dụ, email hoặc số điện thoại để liên lạc
+  rating: {
+    type: Number,
+    default: 5
+  },
+  ratingCount: [
+    {
+      ratedById: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+      },
+      score: {
+        type: Number,
+        required: true
+      },
+      userType: {
+        type: String
+      }
+    }
+  ],
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    required: true
   }
 }, {
   timestamps:true
