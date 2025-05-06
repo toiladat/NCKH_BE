@@ -32,6 +32,10 @@ const userSchema = new mongoose.Schema({
     ref: 'Role',
     required: true,
     default:''
+  },
+  permissionEvaluation: {
+    type:[String],
+    default:[]
   }
 
 }, {

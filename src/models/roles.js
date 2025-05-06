@@ -13,6 +13,9 @@ const roleSchema = new mongoose.Schema(
     permission: {
       type: [String],
       default: []
+    },
+    level: {
+      type:Number
     }
   }
 )

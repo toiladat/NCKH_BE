@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken'
 import tryCatch from '~/utils/tryCatch'
 import needHelp from '~/models/need_help.model'
 import rescueHub from '~/models/rescue_hub.model'
+import Region from '~/models/region.model'
+import { formatRegionName } from '~/utils/formatRegionName'
 //[POST] user/register
 export const register = tryCatch( async ( req, res ) => {
   const { name, email, password } = req.body
@@ -22,11 +24,15 @@ export const register = tryCatch( async ( req, res ) => {
       message: 'User already exist'
     })
   const hashedPassword = await bcrypt.hash ( password, 12) // số lần hash
+  const role = await Role.findOne({
+    level:1
+  })
   const user = await User.create({
     name,
     email: emailLowerCase,
     password: hashedPassword,
-    token
+    token,
+    roleId: role._id
   })
   const { _id: id, photoURL } = user
   const token = jwt.sign(
@@ -62,7 +68,11 @@ export const login = tryCatch( async( req, res ) => {
       message:'Password is not correct'
     })
   }
-  const { _id: id, name, photoURL } = existUser
+  const role =await Role.findOne({
+    _id:existUser.roleId
+  })
+
+  const { _id: id, name, photoURL, permissionEvaluation } = existUser
 
   const token = jwt.sign( // Không lưu token mà dùng giá trị hash ra để compare
     { id, name, photoURL },
@@ -72,7 +82,7 @@ export const login = tryCatch( async( req, res ) => {
   res.status(200).json({
     success:true,
     result:{
-      id, name, email: emailLowerCase, photoURL, token
+      id, name, email: emailLowerCase, photoURL, token, level: role.level, permissionEvaluation
     }
   })
 })
@@ -163,6 +173,54 @@ export const evaluateInfor = tryCatch(async (req, res) => {
     success:true,
     result:{
       message:'ok'
+    }
+  })
+})
+
+//[GET] user/evaluate-level
+export const getEvaluateLevel = tryCatch(async (req, res) => {
+  const address = formatRegionName(req.query.address)
+
+  const oneMonthAgo = new Date()
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+  const needHelpPoints = await needHelp.countDocuments({
+    address: address,
+    createdAt: { $gte: oneMonthAgo }
+  })
+  const rescueHubPoints = await rescueHub.countDocuments({
+    'location_end.address': address,
+    createdAt:{ $gte: oneMonthAgo }
+  })
+  let region =await Region.findOne({
+    name: address
+  })
+
+  const plainRegion = region.toObject()
+  const fullRegion = {
+    ...plainRegion,
+    needHelpPoints,
+    rescueHubPoints
+  }
+  res.status(200).json({
+    success: true,
+    result:fullRegion
+  })
+})
+
+//[PATCH] user/evaluate-level
+export const patchEvaluateLevel = tryCatch( async (req, res) => {
+  const { code, name, criteria } = req.body
+  await Region.updateOne({
+    code: code,
+    name: name
+  }, {
+    criteria:criteria,
+    updatedBy: req.user.id
+  })
+  res.status(200).json({
+    success:true,
+    result: {
+      message:'Đánh giá thành công'
     }
   })
 })

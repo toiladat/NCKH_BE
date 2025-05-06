@@ -23,11 +23,13 @@ const rescueHubSchema = new mongoose.Schema({
   },
   location_start: {
     lng: { type: Number, default: null },
-    lat: { type: Number, default: null }
+    lat: { type: Number, default: null },
+    address:{ type: String, required:true }
   },
   location_end: {
     lng: { type: Number, default: null },
-    lat: { type: Number, default: null }
+    lat: { type: Number, default: null },
+    address:{ type: String, required:true }
   },
   images: {
     type:[String],
