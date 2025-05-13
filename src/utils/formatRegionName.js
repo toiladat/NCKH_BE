@@ -8,6 +8,8 @@ export const formatRegionName = (address) => {
     return 'TP Hồ Chí Minh'
   case 'Bà Rịa-Vũng Tàu':
     return 'Bà Rịa - Vũng Tàu'
+  case 'Haiphong':
+    return 'Hải Phòng'
   default :
     return address
   }

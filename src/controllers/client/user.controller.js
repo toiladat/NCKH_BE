@@ -61,6 +61,12 @@ export const login = tryCatch( async( req, res ) => {
       message:'User does not exist'
     })
   }
+  if ( existUser.status != 'active') {
+    return res.status(400).json({
+      success:false,
+      message:'Tài khoản chưa được kích hoạt hoặc bị cấm'
+    })
+  }
   const correctPassword = await bcrypt.compare(password, existUser.password)
   if (!correctPassword) {
     return res.status(400).json({
@@ -146,6 +152,7 @@ export const evaluateInfor = tryCatch(async (req, res) => {
   const point = await pointModel.findOne({ _id: data.pointId })
 
   // check da danh gia chua
+
   const existingRatingIndex = point.ratingCount.findIndex(
     item => item.ratedById.toString() === data.ratedById.toString()
   )
@@ -191,9 +198,9 @@ export const getEvaluateLevel = tryCatch(async (req, res) => {
     'location_end.address': address,
     createdAt:{ $gte: oneMonthAgo }
   })
-  let region =await Region.findOne({
-    name: address
-  })
+  const region = await Region
+    .findOne({ name: address })
+    .populate('updatedBy', 'name email')
 
   const plainRegion = region.toObject()
   const fullRegion = {
@@ -208,19 +215,24 @@ export const getEvaluateLevel = tryCatch(async (req, res) => {
 })
 
 //[PATCH] user/evaluate-level
-export const patchEvaluateLevel = tryCatch( async (req, res) => {
+export const patchEvaluateLevel = tryCatch(async (req, res) => {
   const { code, name, criteria } = req.body
-  await Region.updateOne({
-    code: code,
-    name: name
-  }, {
-    criteria:criteria,
-    updatedBy: req.user.id
-  })
+
+  const expiredAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 ngày sau
+
+  await Region.updateOne(
+    { code, name },
+    {
+      criteria,
+      updatedBy: req.user.id,
+      expiredAt: expiredAt
+    }
+  )
+
   res.status(200).json({
-    success:true,
+    success: true,
     result: {
-      message:'Đánh giá thành công'
+      message: 'Đánh giá thành công'
     }
   })
 })

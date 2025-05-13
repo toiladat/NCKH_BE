@@ -1,4 +1,5 @@
 import rescueHub from '~/models/rescue_hub.model'
+import Role from '~/models/roles'
 import User from '~/models/user.model'
 import tryCatch from '~/utils/tryCatch'
 //[POST]/rescue-hub
@@ -15,26 +16,42 @@ export const createRescueHub = tryCatch( async (req, res ) => {
   })
 })
 //[GET] /rescue-hub
-export const getRescueHubs = tryCatch( async (req, res) => {
-  const rescueHubPonts =await rescueHub.find()
+export const getRescueHubs = tryCatch(async (req, res) => {
+  const hubList = await rescueHub.find().lean()
 
   const result = await Promise.all(
-    rescueHubPonts.map(async (rescueHub) => {
+    hubList.map(async (hubItem) => {
+      // Lấy thông tin người tạo
+      let userInfor = await User.findOne({ _id: hubItem.createdBy }).select('name photoURL roleId').lean()
+      let level = null
 
-      // lấy ra thông tin người up
-      const userInfor = await User.findOne({ _id: rescueHub.createdBy }).select('name photoURL')
-      // lấy ra ids người đánh giá nâng cao
-      const validByIds = rescueHub?.ratingCount.filter(item => item.userType ==='Cơ quan chức năng' || item.userType ==='Tình nguyện viên')
-      // lấy ra tên người đánh giá nâng cao
-      const validByNames = await User.find({
-        '_id': {
-          $in: validByIds.map(item => item.ratedById)
+      if (userInfor) {
+        const role = await Role.findOne({ _id: userInfor.roleId }).lean()
+        level = role?.level || null
+      } else {
+        userInfor = {
+          name: 'Người dùng không tồn tại',
+          photoURL: '',
+          roleId: null
         }
-      }).select('name')
+      }
 
-      //kết hợp tên và kiểu người đánh giá
-      const validByUsers = validByIds.map( item => {
-        const user = validByNames.find( user => user._id.toString() === item.ratedById.toString())
+      userInfor.level = level
+
+      // Lọc đánh giá nâng cao
+      const validByIds = Array.isArray(hubItem.ratingCount)
+        ? hubItem.ratingCount.filter(item =>
+          item.userType === 'Cơ quan chức năng' || item.userType === 'Tình nguyện viên'
+        )
+        : []
+
+      const ratedIds = validByIds.map(item => item.ratedById)
+
+      const validByNames = await User.find({ _id: { $in: ratedIds } }).select('name').lean()
+
+      // Kết hợp tên và kiểu người đánh giá
+      const validByUsers = validByIds.map(item => {
+        const user = validByNames.find(u => u._id.toString() === item.ratedById.toString())
         return {
           ratedById: item.ratedById,
           userType: item.userType,
@@ -42,17 +59,16 @@ export const getRescueHubs = tryCatch( async (req, res) => {
         }
       })
 
-
       return {
-        ...rescueHub._doc,
+        ...hubItem,
         userInfor,
-        validByUsers: validByUsers
+        validByUsers
       }
     })
   )
 
   res.status(200).json({
     success: true,
-    result: result
+    result
   })
 })

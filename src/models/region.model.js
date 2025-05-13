@@ -37,13 +37,23 @@ const regionSchema = mongoose.Schema(
       type: [criterionSchema],
       default: [
         { type: 'fatalities', name: 'Tử vong / Mất tích', level: 0 },
-        { type: 'injuries', name: 'Bị thương cần cấp cứu', level: 0 },
-        { type: 'housingDamage', name: 'Nhà bị hư hỏng nặng', level: 0 },
-        { type: 'essentialNeeds', name: 'Thiếu lương thực/nước/thuốc', level: 0 },
-        { type: 'vulnerableGroups', name: 'Người dễ tổn thương', level: 0 },
-        { type: 'accessibility', name: 'Mức độ cô lập', level: 0 }
+        { type: 'injuries', name: 'Chấn thương nặng', level: 0 },
+        { type: 'housingDamage', name: 'Thiệt hại nhà ở', level: 0 },
+        { type: 'foodWater', name: 'Nhu yếu phẩm (đồ ăn / nước sạch)', level: 0 },
+        { type: 'medicalSupplies', name: 'Vật dụng y tế', level: 0 },
+        { type: 'vulnerableGroups', name: 'Nhóm dễ tổn thương', level: 0 },
+        { type: 'accessibility', name: 'Khả năng tiếp cận (giao thông)', level: 0 },
+        { type: 'floodDepth', name: 'Mức độ ngập lụt (m)', level: 0 },
+        { type: 'landslideRate', name: 'Tốc độ sạt lở (điểm/giờ)', level: 0 },
+        { type: 'agriculturalLoss', name: 'Thiệt hại mùa màng / chăn nuôi', level: 0 },
+        { type: 'evacuationCapacity', name: 'Khả năng cảnh báo & sơ tán', level: 0 }
       ]
+    },
+    expiredAt: {
+      type: Date,
+      required: true
     }
+
   },
   {
     timestamps: true

@@ -27,6 +27,8 @@ const userSchema = new mongoose.Schema({
     enum: ['active', 'inactive', 'banned'],
     default: 'active'
   },
+  phone:{ type: String, default:'' },
+  address: { type: String, default:'' },
   roleId:{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Role',
@@ -36,8 +38,11 @@ const userSchema = new mongoose.Schema({
   permissionEvaluation: {
     type:[String],
     default:[]
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'admin'
   }
-
 }, {
   timestamps:true
 })
