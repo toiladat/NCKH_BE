@@ -9,6 +9,10 @@ const rescueHubSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
+  contact: {
+    type: String,
+    default:''
+  },
   description:{
     type:String,
     default:''
