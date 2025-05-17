@@ -78,7 +78,7 @@ export const login = tryCatch( async( req, res ) => {
     _id:existUser.roleId
   })
 
-  const { _id: id, name, photoURL, permissionEvaluation } = existUser
+  const { _id: id, name, photoURL, permissionEvaluation, address, phone  } = existUser
 
   const token = jwt.sign( // Không lưu token mà dùng giá trị hash ra để compare
     { id, name, photoURL },
@@ -88,7 +88,7 @@ export const login = tryCatch( async( req, res ) => {
   res.status(200).json({
     success:true,
     result:{
-      id, name, email: emailLowerCase, photoURL, token, level: role.level, permissionEvaluation
+      id, name, email: emailLowerCase, photoURL, token, level: role.level, permissionEvaluation, address, phone
     }
   })
 })
@@ -102,7 +102,7 @@ export const updateProfile = tryCatch(async (req, res ) => {
       new: true //return newest record
     }
   )
-  const { _id: id, name, photoURL }= updateUser
+  const { _id: id, name, photoURL, phone, address }= updateUser
 
   const token = jwt.sign(
     { id, name, photoURL },
@@ -113,7 +113,7 @@ export const updateProfile = tryCatch(async (req, res ) => {
   res.status(200).json({
     success:true,
     result:{
-      name, photoURL, token
+      name, photoURL, token, phone, address
     }
   })
 })
@@ -179,7 +179,7 @@ export const evaluateInfor = tryCatch(async (req, res) => {
   res.status(200).json({
     success:true,
     result:{
-      message:'ok'
+      message:'Đã đánh giá thông tin'
     }
   })
 })

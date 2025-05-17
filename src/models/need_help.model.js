@@ -34,7 +34,12 @@ const needHelpSchema= mongoose.Schema({
         type: String
       }
     }
-  ]
+  ],
+  expireAt: {
+    type: Date,
+    default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 ngày sau
+    expires: 0 // TTL sẽ xóa khi đến đúng thời điểm expireAt
+  }
 }, {
   timestamps :true
 }

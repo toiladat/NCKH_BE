@@ -47,7 +47,7 @@ export const getRescueHubs = tryCatch(async (req, res) => {
 
       const ratedIds = validByIds.map(item => item.ratedById)
 
-      const validByNames = await User.find({ _id: { $in: ratedIds } }).select('name').lean()
+      const validByNames = await User.find({ _id: { $in: ratedIds } }).select('name photoURL').lean()
 
       // Kết hợp tên và kiểu người đánh giá
       const validByUsers = validByIds.map(item => {
@@ -55,7 +55,8 @@ export const getRescueHubs = tryCatch(async (req, res) => {
         return {
           ratedById: item.ratedById,
           userType: item.userType,
-          name: user ? user.name : 'Người dùng chưa xác định'
+          name: user ? user.name : 'Người dùng chưa xác định',
+          photoURL : user.photoURL
         }
       })
 
